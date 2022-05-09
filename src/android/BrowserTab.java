@@ -64,7 +64,7 @@ public class BrowserTab extends CordovaPlugin {
           "android.support.customtabs.action.CustomTabsService";
 
   private boolean mFindCalled = false;
-  private String mCustomTabsBrowser;
+  private String mCustomTabsBrowser = "com.android.chrome";
   private String lastScheme;
   private boolean isInvokedActivitResultClose = false;
   private CallbackContext callbackContext;

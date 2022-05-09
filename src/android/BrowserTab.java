@@ -14,6 +14,11 @@
 
 package com.google.cordova.plugin.browsertab;
 
+/*
+  Referencias:
+    - https://developer.chrome.com/docs/android/custom-tabs/integration-guide/
+ */
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +27,7 @@ import android.net.Uri;
 import android.provider.Browser;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.util.Log;
+import android.graphics.Color;
 
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +54,8 @@ public class BrowserTab extends CordovaPlugin {
   public static final int CUSTOM_TAB_REQUEST_CODE = 1;
 
   private static final String LOG_TAG = "BrowserTab";
+
+  private Color colorParser = new Color();
 
   /**
    * The service we expect to find on a web browser that indicates it supports custom tabs.
@@ -176,10 +184,23 @@ public class BrowserTab extends CordovaPlugin {
       callbackContext.error("no in app browser tab implementation available");
     }
 
-    Intent customTabsIntent = new CustomTabsIntent.Builder().build().intent;
+    // Initialize Builder
+    CustomTabsIntent.Builder customTabsIntentBuilder = new CustomTabsIntent.Builder();
+
+    // Set tab color
+    String tabColor = cordova.getActivity().getString(cordova.getActivity().getResources().getIdentifier("CUSTOM_TAB_COLOR_RGB", "string", cordova.getActivity().getPackageName()));
+    customTabsIntentBuilder.setToolbarColor(colorParser.parseColor(tabColor));
+
+    Intent customTabsIntent = customTabsIntentBuilder.build().intent;
     customTabsIntent.setData(Uri.parse(urlStr));
     customTabsIntent.setPackage(mCustomTabsBrowser);
-    cordova.startActivityForResult(this, customTabsIntent, CUSTOM_TAB_REQUEST_CODE);
+
+    try {
+      cordova.startActivityForResult(this, customTabsIntent, CUSTOM_TAB_REQUEST_CODE);
+    } catch(Exception e) {
+      customTabsIntent.setPackage(null);
+      cordova.startActivityForResult(this, customTabsIntent, CUSTOM_TAB_REQUEST_CODE);
+    }
 
     this.callbackContext = callbackContext;
     sendOpenResult(callbackContext);

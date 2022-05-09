@@ -43,6 +43,7 @@ var close = function(opt_error) {
  * @param {Function} error
  */
 exports.openUrl = function (url, options, success, error) {
+   if(options == undefined) { options = {authSession:false, scheme:""} }
    exports.isAvailable(function (result) {
        if (result) {
            exports.openUrlInTab(url, options, success, error);
@@ -68,7 +69,6 @@ exports.openUrl = function (url, options, success, error) {
 exports.openUrlInTab = function(url, options, success, error) {
     if(options == undefined) { options = {authSession:false, scheme:""} }
     exec(success, function(args){
-        console.log(args);
         if(args != undefined && Number.isInteger(args) && args == 1) {
             //Open successfully;
             if(options.onOpen != undefined) {
